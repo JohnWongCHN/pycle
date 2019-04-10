@@ -5,7 +5,7 @@
 @LastEditors: John Wong
 @Description: 
 @Date: 2019-03-29 09:18:05
-@LastEditTime: 2019-04-08 10:52:28
+@LastEditTime: 2019-04-10 10:29:38
 '''
 
 import click
@@ -220,6 +220,7 @@ def main():
     example: \n
     pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
     '''
+    click.echo('echo first')
     pass
 
 # @click.group()
@@ -255,14 +256,14 @@ def chk_oracle(host, port, sid, user, passwd, **kwargs):
         click.echo(str(e))
 
 
-@main.command(help=u'查询Mysql --待开发')
-def chk_mysql():
-    pass
+# @main.command(help=u'查询Mysql --待开发')
+# def chk_mysql():
+#     pass
 
 
-@main.command(help=u'查询mongo --待开发')
-def chk_mongo():
-    pass
+# @main.command(help=u'查询mongo --待开发')
+# def chk_mongo():
+#     pass
 
 
 if __name__ == "__main__":
