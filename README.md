@@ -1,3 +1,10 @@
+<!--
+ * @Description: In User Settings Edit
+ * @Author: your name
+ * @Date: 2019-04-08 15:51:04
+ * @LastEditTime: 2019-08-28 12:17:49
+ * @LastEditors: Please set LastEditors
+ -->
 # Python CLI Tool to Monitor Oracle Database
 
 [TOC]
@@ -98,6 +105,7 @@ grant select on v_$memory_dynamic_components to "PYCLE";
 grant select on v_$log to "PYCLE";
 grant select on v_$event_name to "PYCLE";
 grant select on v_$archive_dest to "PYCLE";
+grant select on v_$log_history to "PYCLE";
 grant select on dba_alert_history to "PYCLE";
 grant select on dba_objects to "PYCLE";
 grant select on dba_users to "PYCLE";

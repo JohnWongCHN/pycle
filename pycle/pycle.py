@@ -5,7 +5,7 @@
 @LastEditors: John Wong
 @Description: 
 @Date: 2019-03-29 09:18:05
-@LastEditTime: 2019-04-10 10:29:38
+@LastEditTime: 2019-08-28 12:46:19
 '''
 
 import click
@@ -43,9 +43,9 @@ sqls = {
                         and d.name = 'sorts (disk)'
                         ''',
     "count_of_active_users": '''
-                             select to_char(count(*)-1, 'fm99999999999999990') retvalue
+                             select to_char(count(*), 'fm99999999999999990') retvalue
                              from v$session where username is not null
-                             and status='active'
+                             and status='ACTIVE'
                              ''',
     "size_of_user_data": '''
                         select to_char(sum(  nvl(a.bytes - nvl(f.bytes, 0), 0)),
@@ -98,20 +98,20 @@ sqls = {
                 ''',
     "hardparseratio": '''
                       select nvl(to_char(h.value/t.value*100,'fm99999990.9999'), '0')
-                      retvalue from  v$sysstat h, v$sysstat t where h.name = 'parse
-                      count (hard)' and t.name = 'parse count (total)'
+                      retvalue from  v$sysstat h, v$sysstat t where h.name = 'parse count (hard)'
+                      and t.name = 'parse count (total)'
                       ''',
-    "netset": '''
+    "netsent": '''
               select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue from
-              v$sysstat where name = 'bytes sent via sql*net to client'
+              v$sysstat where name = 'bytes sent via SQL*Net to client'
               ''',
     "netrecv": '''
                select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue from
-               v$sysstat where name = 'bytes received via sql*net from client'
+               v$sysstat where name = 'bytes received via SQL*Net from client'
                ''',
     "netroundtrips": '''
                      select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue from
-                     v$sysstat where name = 'sql*net roundtrips to/from client'
+                     v$sysstat where name = 'SQL*Net roundtrips to/from client'
                      ''',
     "currentloggons": '''
                       select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue from
@@ -119,12 +119,12 @@ sqls = {
                       ''',
     "lastarch": '''
                 select to_char(max(sequence#), 'fm99999999999999990')
-                retvalue from v$log where archived = 'yes'
+                retvalue from v$log where archived = 'YES'
                 ''',
     "lastapplyarch": '''
                      select to_char(max(lh.sequence#), 'fm99999999999999990')
-                     retvalue from v$loghist lh, v$archived_log al
-                     where lh.sequence# = al.sequence# and applied='yes'
+                     retvalue from v$log_history lh, v$archived_log al
+                     where lh.sequence# = al.sequence# and applied='YES'
                      ''',
     "freebuffwaits": '''
                      select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
@@ -151,11 +151,6 @@ sqls = {
                         from v$system_event se, v$event_name en where se.event(+)
                         = en.name and en.name = 'log file parallel write'
                         ''',
-    "enqueue": '''
-               select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
-               from v$system_event se, v$event_name en
-               where se.event(+) = en.name and en.name = 'enqueue'
-               ''',
     "dbseqreadwait": '''
                      select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
                      from v$system_event se, v$event_name en where se.event(+)
@@ -212,6 +207,7 @@ sqls = {
 
 check_item = tuple(sqls.keys())
 
+
 # @click.group(chain=True)
 @click.group()
 def main():
@@ -220,7 +216,6 @@ def main():
     example: \n
     pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
     '''
-    click.echo('echo first')
     pass
 
 # @click.group()
