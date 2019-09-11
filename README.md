@@ -5,6 +5,7 @@
  * @LastEditTime: 2019-08-28 12:17:49
  * @LastEditors: Please set LastEditors
  -->
+
 # Python CLI Tool to Monitor Oracle Database
 
 [TOC]
@@ -13,7 +14,7 @@ I name it **Pycle**, which means `Python` + `Oracle`. It's inspired by another o
 
 Pyora is good, but with some disadvantes, it does not support Python 3. So i try to use `Click`, `cx_Oracle` rewirte it, make it more compatible with Python 2 & Python 3.
 
-Which `Click` is another great package to build CLI utility, official site: <https://click.palletsprojects.com/en/7.x/> 
+Which `Click` is another great package to build CLI utility, official site: <https://click.palletsprojects.com/en/7.x/>
 
 > Click is a Python package for creating beautiful command line interfaces in a composable way with as little code as necessary. It’s the “Command Line Interface Creation Kit”. It’s highly configurable but comes with sensible defaults out of the box.
 >
@@ -60,7 +61,7 @@ $ pip install click
 $ pip install cx_Oracle
 
 # run test
-$ python pycle.py --help           
+$ python pycle.py --help
 Usage: pycle.py [OPTIONS] COMMAND [ARGS]...
 
   A CLI utility to check some database
@@ -106,6 +107,7 @@ grant select on v_$log to "PYCLE";
 grant select on v_$event_name to "PYCLE";
 grant select on v_$archive_dest to "PYCLE";
 grant select on v_$log_history to "PYCLE";
+grant select on v_$database to "PYCLE";
 grant select on dba_alert_history to "PYCLE";
 grant select on dba_objects to "PYCLE";
 grant select on dba_users to "PYCLE";
@@ -124,40 +126,40 @@ grant select on dba_segments to "PYCLE";
 
   default values:
 
-  ​	host = 127.0.0.1
+  ​ host = 127.0.0.1
 
-  ​	port = 1521
+  ​ port = 1521
 
-  ​	sid = orcl
+  ​ sid = orcl
 
-  ​	user = pycle
+  ​ user = pycle
 
-  ​	password = pycle
+  ​ password = pycle
 
   ```shell
   # get help text
-  $ pycle --help                                  
+  $ pycle --help
   Usage: pycle [OPTIONS] COMMAND [ARGS]...
-  
+
     A CLI utility to check some database
-  
+
     example:
-  
+
     pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
-  
+
   Options:
     --help  Show this message and exit.
-  
+
   Commands:
     chk-oracle  查询Oracle
-    
+
   # get help text for chk-oracle
   pycle chk-oracle --help
   echo first
   Usage: pycle chk-oracle [OPTIONS]
-  
+
     查询Oracle
-  
+
   Options:
     -h, --host TEXT                 数据库IP地址  [required]
     -p, --port TEXT                 数据库监听端口  [required]
@@ -177,25 +179,25 @@ grant select on dba_segments to "PYCLE";
   ```shell
   $ python pycle.py --help
   Usage: pycle.py [OPTIONS] COMMAND [ARGS]...
-  
+
     A CLI utility to check some database
-  
+
     example:
-  
+
     pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
-  
+
   Options:
     --help  Show this message and exit.
-  
+
   Commands:
     chk-oracle  查询Oracle
-    
+
   $ python pycle/pycle.py chk-oracle --help
   echo first
   Usage: pycle.py chk-oracle [OPTIONS]
-  
+
     查询Oracle
-  
+
   Options:
     -h, --host TEXT                 数据库IP地址  [required]
     -p, --port TEXT                 数据库监听端口  [required]
@@ -241,7 +243,7 @@ Say you try to build your scripts, here is a brief introduction for how to get y
 
   - Client side configuration
 
-    After install cx_Oracle, package,  you need to configure correctly your environment to use cx_Oracle. I'm using macOS, so check bellow content for how to configure client on macOS. for other platform, such as Windows, Linux, choose specific installation guide on this [url](https://cx-oracle.readthedocs.io/en/latest/installation.html#).
+    After install cx_Oracle, package, you need to configure correctly your environment to use cx_Oracle. I'm using macOS, so check bellow content for how to configure client on macOS. for other platform, such as Windows, Linux, choose specific installation guide on this [url](https://cx-oracle.readthedocs.io/en/latest/installation.html#).
 
     1. Download Oracle instant client from [here](http://www.oracle.com/technetwork/topics/intel-macsoft-096467.html). Choose either a 64-bit or 32-bit package, matching your Python architecture.
 
