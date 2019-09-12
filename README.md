@@ -108,6 +108,8 @@ grant select on v_$event_name to "PYCLE";
 grant select on v_$archive_dest to "PYCLE";
 grant select on v_$log_history to "PYCLE";
 grant select on v_$database to "PYCLE";
+grant select on v_$osstat to "PYCLE";
+grant select on v_$process to "PYCLE";
 grant select on dba_alert_history to "PYCLE";
 grant select on dba_objects to "PYCLE";
 grant select on dba_users to "PYCLE";
