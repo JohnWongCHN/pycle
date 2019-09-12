@@ -110,6 +110,8 @@ grant select on v_$log_history to "PYCLE";
 grant select on v_$database to "PYCLE";
 grant select on v_$osstat to "PYCLE";
 grant select on v_$process to "PYCLE";
+grant select on v_$temp_space_header to "PYCLE";
+grant select on v_$temp_extent_pool  to "PYCLE";
 grant select on dba_alert_history to "PYCLE";
 grant select on dba_objects to "PYCLE";
 grant select on dba_users to "PYCLE";
@@ -120,6 +122,7 @@ grant select on dba_tablespaces to "PYCLE";
 grant select on dba_data_files to "PYCLE";
 grant select on dba_free_space to "PYCLE";
 grant select on dba_segments to "PYCLE";
+grant select on dba_temp_files to "PYCLE";
 ```
 
 - **Run pycle command**
