@@ -112,6 +112,19 @@ grant select on v_$osstat to "PYCLE";
 grant select on v_$process to "PYCLE";
 grant select on v_$temp_space_header to "PYCLE";
 grant select on v_$temp_extent_pool  to "PYCLE";
+grant select on v_$asm_disk to "PYCLE";
+grant select on v_$asm_file to "PYCLE";
+grant select on v_$recovery_file_dest to "PYCLE";
+grant select on v_$flash_recovery_area_usage to "PYCLE";
+grant select on v_$session to "PYCLE";
+grant select on v_$transaction to "PYCLE";
+grant select on v_$rollname to "PYCLE";
+grant select on v_$rollstat to "PYCLE";
+grant select on v_$sort_usage to "PYCLE"
+grant select on v_$db_object_cache to "PYCLE";
+grant select on v_$sqlarea to "PYCLE";
+grant select on v_$sesstat to "PYCLE";
+grant select on v_$statname to "PYCLE";
 grant select on dba_alert_history to "PYCLE";
 grant select on dba_objects to "PYCLE";
 grant select on dba_users to "PYCLE";
@@ -123,6 +136,19 @@ grant select on dba_data_files to "PYCLE";
 grant select on dba_free_space to "PYCLE";
 grant select on dba_segments to "PYCLE";
 grant select on dba_temp_files to "PYCLE";
+grant select on dba_tables to "PYCLE";
+grant select on dba_indexes to "PYCLE";
+grant select on dba_ind_columns to "PYCLE";
+grant select on dba_recyclebin to "PYCLE";
+grant select on dba_tab_partitions to "PYCLE";
+grant select on dba_ind_partitions to "PYCLE";
+grant select on dba_tab_cols to "PYCLE";
+grant select on dba_scheduler_jobs to "PYCLE";
+grant select on dba_autotask_client to "PYCLE";
+grant select on DBA_AUTOTASK_WINDOW_CLIENTS to "PYCLE";
+grant select on dba_tab_statistics to "PYCLE";
+grant select on dba_constraints to "PYCLE";
+grant select on dba_cons_columns to "PYCLE";
 ```
 
 - **Run pycle command**
