@@ -81,7 +81,7 @@ Commands:
 
 There are two way to use this utility, run `pycle` command or run `pycle.py` scripts directly. Before use to check Oracle database, you need create a user `pycle`, bellow is creation script
 
-```shell
+```sql
 CREATE USER "PYCLE" IDENTIFIED BY "pycle";
 grant "CONNECT" TO "PYCLE";
 grant select on v_$instance to "PYCLE";
@@ -125,6 +125,8 @@ grant select on v_$db_object_cache to "PYCLE";
 grant select on v_$sqlarea to "PYCLE";
 grant select on v_$sesstat to "PYCLE";
 grant select on v_$statname to "PYCLE";
+grant select on v_$standby_log to "PYCLE";
+grant select on v_$logfile to "PYCLE";
 grant select on dba_alert_history to "PYCLE";
 grant select on dba_objects to "PYCLE";
 grant select on dba_users to "PYCLE";
@@ -149,6 +151,9 @@ grant select on DBA_AUTOTASK_WINDOW_CLIENTS to "PYCLE";
 grant select on dba_tab_statistics to "PYCLE";
 grant select on dba_constraints to "PYCLE";
 grant select on dba_cons_columns to "PYCLE";
+grant select on dba_hist_snapshot to "PYCLE";
+GRANT EXECUTE ON "SYS"."DBMS_WORKLOAD_REPOSITORY" TO "PYCLE"
+GRANT EXECUTE ON "SYS"."DBMS_ADVISOR" TO "PYCLE"
 ```
 
 - **Run pycle command**
