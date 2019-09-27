@@ -1,0 +1,272 @@
+# 关于ymal的多行字符串，可以参考https://yaml-multiline.info/
+# 里面有demo说明。本配置文件采用的是块向量（block scalars）语法
+---
+dbversion: |-
+  select banner
+  from v$version
+  where rownum = 1
+dbsize: |-
+  select sum(bytes)
+  from dba_segments
+check_active: |-
+  select to_char(case when inst_cnt > 0 then 1 else 0 end,
+                'fm99999999999999990') retvalue
+  from (select count(*) inst_cnt
+        from v$instance
+        where status = 'open'
+          and logins = 'allowed'
+          and database_status = 'active')
+read_cache_hit_ratio: |-
+  select nvl(to_char((1 - (phy.value - lob.value - dir.value) /
+                          ses.value) * 100, 'fm99999990.9999'), '0') retvalue
+  from v$sysstat ses,
+      v$sysstat lob,
+      v$sysstat dir,
+      v$sysstat phy
+  where ses.name = 'session logical reads'
+    and dir.name = 'physical reads direct'
+    and lob.name = 'physical reads direct (lob)'
+    and phy.name = 'physical reads'
+disk_sorts_ratio: |-
+  select nvl(to_char(d.value / (d.value + m.value) * 100,
+                    'fm99999990.9999'), '0') retvalue
+  from v$sysstat m,
+      v$sysstat d
+  where m.name = 'sorts (memory)'
+    and d.name = 'sorts (disk)'
+count_of_active_users: |-
+  select to_char(count(*), 'fm99999999999999990') retvalue
+  from v$session
+  where username is not null
+    and status = 'ACTIVE'
+size_of_user_data: |-
+  select to_char(sum(nvl(a.bytes - nvl(f.bytes, 0), 0)),
+                'fm99999999999999990') retvalue
+  from dba_tablespaces d,
+      (select tablespace_name, sum(bytes) bytes
+        from dba_data_files
+        group by tablespace_name) a,
+      (select tablespace_name, sum(bytes) bytes
+        from dba_free_space
+        group by tablespace_name) f
+  where d.tablespace_name = a.tablespace_name(+)
+    and d.tablespace_name = f.tablespace_name(+)
+    and not (d.extent_management like 'local' and d.contents
+      like 'temporary') 
+dbfilesize: |-
+  select to_char(sum(bytes), 'fm99999999999999990') retvalue
+  from dba_data_files
+dbuptime: |-
+  select to_char((sysdate - startup_time) * 86400,
+                'fm99999999999999990') retvalue
+  from v$instance
+usercommits: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'user commits'
+userrollback: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'user rollbacks'
+deadlocks: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'enqueue deadlocks'
+redowrites: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'redo writes'
+tablescans: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'table scans (long tables)'
+tablerowscans: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'table scan rows gotten'
+indexffs: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'index fast full scans (full)'
+hardparseratio: |-
+  select nvl(to_char(h.value / t.value * 100, 'fm99999990.9999'), '0')
+            retvalue
+  from v$sysstat h,
+      v$sysstat t
+  where h.name = 'parse count (hard)'
+    and t.name = 'parse count (total)'
+netsent: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'bytes sent via SQL*Net to client'
+netrecv: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'bytes received via SQL*Net from client'
+netroundtrips: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'SQL*Net roundtrips to/from client'
+currentloggons: |-
+  select nvl(to_char(value, 'fm99999999999999990'), '0') retvalue
+  from v$sysstat
+  where name = 'logons current'
+lastarch: |-
+  select to_char(max(sequence#), 'fm99999999999999990')
+            retvalue
+  from v$log
+  where archived = 'YES'
+lastapplyarch: |-
+  select to_char(max(lh.sequence#), 'fm99999999999999990')
+            retvalue
+  from v$log_history lh,
+      v$archived_log al
+  where lh.sequence# = al.sequence#
+    and applied = 'YES'
+freebuffwaits: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+) = en.name
+    and en.name = 'free buffer waits'
+busybuffwaits: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+) =
+        en.name
+    and en.name = 'buffer busy waits'
+logswitcompletion: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'log file switch completion'
+logfilesync: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+) = en.name
+    and en.name = 'log file sync'
+logparallelwrite: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'log file parallel write'
+dbseqreadwait: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'db file sequential read'
+dbscatteredread: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'db file scattered read'
+dbsinglewrite: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'db file single write'
+dbparallelwrite: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'db file parallel write'
+directpathread: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'direct path read'
+directpathwrite: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'direct path write'
+latchfree: |-
+  select nvl(to_char(time_waited, 'fm99999999999999990'), '0') retvalue
+  from v$system_event se,
+      v$event_name en
+  where se.event(+)
+      = en.name
+    and en.name = 'latch free'
+tablespace_discovery: |-
+  select TABLESPACE_NAME
+  from DBA_DATA_FILES
+  union
+  select TABLESPACE_NAME
+  from DBA_TEMP_FILES
+tablespace: |-
+  with e as (SELECT a.tablespace_name,
+                    a.bytes_alloc        "SIZE",
+                    NVL(b.bytes_free, 0) "FREE",
+                    a.bytes_alloc - NVL(b.bytes_free, 0)
+                                        "USED",
+                    (NVL(b.bytes_free, 0) / a.bytes_alloc) * 100
+                                        "FREE%",
+                    round(100 - (NVL(b.bytes_free, 0) / a.bytes_alloc) * 100)
+                                        "USED%",
+                    maxbytes             "MAX"
+            FROM (SELECT f.tablespace_name,
+                          SUM(f.bytes) bytes_alloc,
+                          SUM(
+                                  DECODE(f.autoextensible,
+                                        'YES', f.maxbytes,
+                                        'NO', f.bytes))
+                                      maxbytes
+                  FROM dba_data_files f
+                  GROUP BY tablespace_name) a,
+                  (SELECT f.tablespace_name, SUM(f.bytes) bytes_free
+                  FROM dba_free_space f
+                  GROUP BY tablespace_name) b
+            WHERE a.tablespace_name = b.tablespace_name(+)
+            UNION ALL
+            SELECT h.tablespace_name,
+                    SUM(h.bytes_free + h.bytes_used) "SIZE",
+                    SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                                                    "FREE",
+                    SUM(NVL(p.bytes_used, 0))        "USED",
+                    (SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                        / SUM(h.bytes_used + h.bytes_free))
+                        * 100
+                                                    "FREE%",
+                    100
+                        -
+                    round((SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                        / SUM(h.bytes_used + h.bytes_free))
+                        * 100)
+                                                    "USED%",
+                    SUM(
+                            DECODE(f.autoextensible, 'YES', f.maxbytes, 'NO', f.bytes)
+                        )
+                                                    "MAX"
+            FROM sys.v_$temp_space_header h,
+                  sys.v_$temp_extent_pool p,
+                  dba_temp_files f
+            WHERE p.file_id(+) = h.file_id
+              AND p.tablespace_name(+) = h.tablespace_name
+              AND f.file_id = h.file_id
+              AND f.tablespace_name = h.tablespace_name
+            GROUP BY h.tablespace_name)
+  select e.tablespace_name,
+        e."SIZE",
+        e.USED,
+        e."USED%",
+        e.max
+  from e
+  where e.tablespace_name = '{0}'

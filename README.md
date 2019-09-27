@@ -1,11 +1,3 @@
-<!--
- * @Description: In User Settings Edit
- * @Author: your name
- * @Date: 2019-04-08 15:51:04
- * @LastEditTime: 2019-08-28 12:17:49
- * @LastEditors: Please set LastEditors
- -->
-
 # Python CLI Tool to Monitor Oracle Database
 
 [TOC]
@@ -120,13 +112,14 @@ grant select on v_$session to "PYCLE";
 grant select on v_$transaction to "PYCLE";
 grant select on v_$rollname to "PYCLE";
 grant select on v_$rollstat to "PYCLE";
-grant select on v_$sort_usage to "PYCLE"
+grant select on v_$sort_usage to "PYCLE";
 grant select on v_$db_object_cache to "PYCLE";
 grant select on v_$sqlarea to "PYCLE";
 grant select on v_$sesstat to "PYCLE";
 grant select on v_$statname to "PYCLE";
 grant select on v_$standby_log to "PYCLE";
 grant select on v_$logfile to "PYCLE";
+grant select on v_$sql to "PYCLE";
 grant select on dba_alert_history to "PYCLE";
 grant select on dba_objects to "PYCLE";
 grant select on dba_users to "PYCLE";
@@ -152,8 +145,8 @@ grant select on dba_tab_statistics to "PYCLE";
 grant select on dba_constraints to "PYCLE";
 grant select on dba_cons_columns to "PYCLE";
 grant select on dba_hist_snapshot to "PYCLE";
-GRANT EXECUTE ON "SYS"."DBMS_WORKLOAD_REPOSITORY" TO "PYCLE"
-GRANT EXECUTE ON "SYS"."DBMS_ADVISOR" TO "PYCLE"
+GRANT EXECUTE ON "SYS"."DBMS_WORKLOAD_REPOSITORY" TO "PYCLE";
+GRANT EXECUTE ON "SYS"."DBMS_ADVISOR" TO "PYCLE";
 ```
 
 - **Run pycle command**
