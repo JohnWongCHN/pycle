@@ -1,6 +1,6 @@
 import click
 import cx_Oracle
-import pandas as pd
+import json
 from pkg_resources import resource_stream
 from yaml import load
 try:
@@ -62,8 +62,13 @@ def discovery(conn_parameter, discovery_type):
                                    password=conn_parameter.get('password'),
                                    dsn=conn_parameter.get('dsn'),
                                    encoding='utf-8') as connection:
-                ret_json = pd.read_sql(sql=sql, con=connection).to_json()
-                click.echo(ret_json)
+                cursor = connection.cursor()
+                cursor.execute(sql)
+                rows = cursor.fetchall()
+                ret_json = []
+                for row in rows:
+                    ret_json.append(dict(zip(['{#DNAME}'], row)))
+                click.echo(json.dumps(ret_json))
         except Exception as e:
             click.echo(str(e))
     else:
