@@ -53,7 +53,7 @@ def pycle(ctx, host, port, sid, user, passwd):
 @click.pass_obj
 def discovery(conn_parameter, discovery_type):
     '''
-    获得多行多列值，返回json格式，供zabbix进行low level discovery采集
+    获得多行值，返回json格式，供zabbix进行low level discovery采集
     '''
     if discovery_type in sqls:
         sql = sqls.get(discovery_type)

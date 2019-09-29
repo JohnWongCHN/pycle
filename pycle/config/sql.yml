@@ -211,7 +211,7 @@ tablespace_discovery: |-
   union
   select TABLESPACE_NAME
   from DBA_TEMP_FILES
-tablespace: |-
+tablespace_size: |-
   with e as (SELECT a.tablespace_name,
                     a.bytes_alloc        "SIZE",
                     NVL(b.bytes_free, 0) "FREE",
@@ -263,10 +263,61 @@ tablespace: |-
               AND f.file_id = h.file_id
               AND f.tablespace_name = h.tablespace_name
             GROUP BY h.tablespace_name)
-  select e.tablespace_name,
-        e."SIZE",
-        e.USED,
-        e."USED%",
-        e.max
+  select e.USED
+  from e
+  where e.tablespace_name = '{0}'
+tablespace_max_size: |-
+  with e as (SELECT a.tablespace_name,
+                    a.bytes_alloc        "SIZE",
+                    NVL(b.bytes_free, 0) "FREE",
+                    a.bytes_alloc - NVL(b.bytes_free, 0)
+                                        "USED",
+                    (NVL(b.bytes_free, 0) / a.bytes_alloc) * 100
+                                        "FREE%",
+                    round(100 - (NVL(b.bytes_free, 0) / a.bytes_alloc) * 100)
+                                        "USED%",
+                    maxbytes             "MAX"
+            FROM (SELECT f.tablespace_name,
+                          SUM(f.bytes) bytes_alloc,
+                          SUM(
+                                  DECODE(f.autoextensible,
+                                        'YES', f.maxbytes,
+                                        'NO', f.bytes))
+                                      maxbytes
+                  FROM dba_data_files f
+                  GROUP BY tablespace_name) a,
+                  (SELECT f.tablespace_name, SUM(f.bytes) bytes_free
+                  FROM dba_free_space f
+                  GROUP BY tablespace_name) b
+            WHERE a.tablespace_name = b.tablespace_name(+)
+            UNION ALL
+            SELECT h.tablespace_name,
+                    SUM(h.bytes_free + h.bytes_used) "SIZE",
+                    SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                                                    "FREE",
+                    SUM(NVL(p.bytes_used, 0))        "USED",
+                    (SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                        / SUM(h.bytes_used + h.bytes_free))
+                        * 100
+                                                    "FREE%",
+                    100
+                        -
+                    round((SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                        / SUM(h.bytes_used + h.bytes_free))
+                        * 100)
+                                                    "USED%",
+                    SUM(
+                            DECODE(f.autoextensible, 'YES', f.maxbytes, 'NO', f.bytes)
+                        )
+                                                    "MAX"
+            FROM sys.v_$temp_space_header h,
+                  sys.v_$temp_extent_pool p,
+                  dba_temp_files f
+            WHERE p.file_id(+) = h.file_id
+              AND p.tablespace_name(+) = h.tablespace_name
+              AND f.file_id = h.file_id
+              AND f.tablespace_name = h.tablespace_name
+            GROUP BY h.tablespace_name)
+  select e.max
   from e
   where e.tablespace_name = '{0}'
