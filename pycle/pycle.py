@@ -23,7 +23,7 @@ def pycle(ctx, host, port, sid, user, passwd):
     '''
     A CLI utility to check some database \n
     example: \n
-    pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
+    pycle -h 172.16.2.91 -p 1521 -s ywptdata1 -u pycle -P pycle get-metric -m asm_size -v DATA
     '''
     # make dsn and connect to Oracle instance
     dsn = cx_Oracle.makedsn(host=host, port=port, sid=sid)

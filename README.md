@@ -34,13 +34,19 @@ Usage: pycle [OPTIONS] COMMAND [ARGS]...
 
   example:
 
-  pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
+  pycle -h 172.16.2.91 -p 1521 -s ywptdata1 -u pycle -P pycle get-metric -m asm_size -v DATA
 
 Options:
-  --help  Show this message and exit.
+  -h, --host TEXT    IP地址  [required]
+  -p, --port TEXT    监听端口  [required]
+  -s, --sid TEXT     实例SID  [required]
+  -u, --user TEXT    用户名  [required]
+  -P, --passwd TEXT  密码  [required]
+  --help             Show this message and exit.
 
 Commands:
-  chk-oracle  查询Oracle
+  discovery   获得多行值，返回json格式，供zabbix进行low level discovery采集
+  get-metric  获取指标，返回单个值，供zabbix采集监控
 ```
 
 Or you can just download `pycle.py` scripts, but in this way you need to resolve dependency package by yourself
@@ -54,19 +60,25 @@ $ pip install cx_Oracle
 
 # run test
 $ python pycle.py --help
-Usage: pycle.py [OPTIONS] COMMAND [ARGS]...
+Usage: pycle [OPTIONS] COMMAND [ARGS]...
 
   A CLI utility to check some database
 
   example:
 
-  pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
+  pycle -h 172.16.2.91 -p 1521 -s ywptdata1 -u pycle -P pycle get-metric -m asm_size -v DATA
 
 Options:
-  --help  Show this message and exit.
+  -h, --host TEXT    IP地址  [required]
+  -p, --port TEXT    监听端口  [required]
+  -s, --sid TEXT     实例SID  [required]
+  -u, --user TEXT    用户名  [required]
+  -P, --passwd TEXT  密码  [required]
+  --help             Show this message and exit.
 
 Commands:
-  chk-oracle  查询Oracle
+  discovery   获得多行值，返回json格式，供zabbix进行low level discovery采集
+  get-metric  获取指标，返回单个值，供zabbix采集监控
 ```
 
 ## How to Use
@@ -151,7 +163,7 @@ GRANT EXECUTE ON "SYS"."DBMS_ADVISOR" TO "PYCLE";
 
 - **Run pycle command**
 
-  run pycle command would be easy and simple way, you don't need to give path to pycle.py to run. All options for chk-oracle command get a default value
+  run pycle command would be easy and simple way, you don't need to give path to pycle.py to run.
 
   default values:
 
@@ -174,69 +186,30 @@ GRANT EXECUTE ON "SYS"."DBMS_ADVISOR" TO "PYCLE";
 
     example:
 
-    pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
+    pycle -h 172.16.2.91 -p 1521 -s ywptdata1 -u pycle -P pycle get-metric -m
+    asm_size -v DATA
 
   Options:
-    --help  Show this message and exit.
+    -h, --host TEXT    IP地址  [required]
+    -p, --port TEXT    监听端口  [required]
+    -s, --sid TEXT     实例SID  [required]
+    -u, --user TEXT    用户名  [required]
+    -P, --passwd TEXT  密码  [required]
+    --help             Show this message and exit.
 
   Commands:
-    chk-oracle  查询Oracle
+    discovery   获得多行值，返回json格式，供zabbix进行low level discovery采集
+    get-metric  获取指标，返回单个值，供zabbix采集监控
 
   # get help text for chk-oracle
-  pycle chk-oracle --help
-  echo first
-  Usage: pycle chk-oracle [OPTIONS]
+  pycle discovery --help
+  Usage: pycle discovery [OPTIONS]
 
-    查询Oracle
-
-  Options:
-    -h, --host TEXT                 数据库IP地址  [required]
-    -p, --port TEXT                 数据库监听端口  [required]
-    -s, --sid TEXT                  数据库实例SID  [required]
-    -u, --user TEXT                 数据库用户名  [required]
-    -P, --passwd TEXT               用户密码  [required]
-    -c, --check [dbversion|dbsize|check_active|read_cache_hit_ratio|disk_sorts_ratio|count_of_active_users|size_of_user_data|dbfilesize|dbuptime|usercommits|userrollback|deadlocks|redowrites|tablescans|tablerowscans|indexffs|hardparseratio|netset|netrecv|netroundtrips|currentloggons|lastarch|lastapplyarch|freebuffwaits|busybuffwaits|logswitcompletion|logfilesync|logparallelwrite|enqueue|dbseqreadwait|dbscatteredread|dbsinglewrite|dbparallelwrite|directpathread|directpathwrite|latchfree|tablespace|tablespaceinuse]
-                                    查询目标
-    -C, --checkparam TEXT           查询参数
-    --help                          Show this message and exit.
-  ```
-
-- **Run pycle.py script**
-
-  To run pycle.py script is a little different from run pycle command
-
-  ```shell
-  $ python pycle.py --help
-  Usage: pycle.py [OPTIONS] COMMAND [ARGS]...
-
-    A CLI utility to check some database
-
-    example:
-
-    pycle chk-oracle --host='127.0.0.1' --port='1521', --sid='orcl'
+    获得多行值，返回json格式，供zabbix进行low level discovery采集
 
   Options:
-    --help  Show this message and exit.
-
-  Commands:
-    chk-oracle  查询Oracle
-
-  $ python pycle/pycle.py chk-oracle --help
-  echo first
-  Usage: pycle.py chk-oracle [OPTIONS]
-
-    查询Oracle
-
-  Options:
-    -h, --host TEXT                 数据库IP地址  [required]
-    -p, --port TEXT                 数据库监听端口  [required]
-    -s, --sid TEXT                  数据库实例SID  [required]
-    -u, --user TEXT                 数据库用户名  [required]
-    -P, --passwd TEXT               用户密码  [required]
-    -c, --check [dbversion|dbsize|check_active|read_cache_hit_ratio|disk_sorts_ratio|count_of_active_users|size_of_user_data|dbfilesize|dbuptime|usercommits|userrollback|deadlocks|redowrites|tablescans|tablerowscans|indexffs|hardparseratio|netset|netrecv|netroundtrips|currentloggons|lastarch|lastapplyarch|freebuffwaits|busybuffwaits|logswitcompletion|logfilesync|logparallelwrite|enqueue|dbseqreadwait|dbscatteredread|dbsinglewrite|dbparallelwrite|directpathread|directpathwrite|latchfree|tablespace|tablespaceinuse]
-                                    查询目标
-    -C, --checkparam TEXT           查询参数
-    --help                          Show this message and exit.
+    -d, --discovery-type TEXT  discovery类型  [required]
+    --help                     Show this message and exit.
   ```
 
 - Example
