@@ -15,7 +15,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'Click',
-        'cx-Oracle'
+        'cx-Oracle',
+        'PyYAML',
     ],
     classifiers=[
         "License :: OSI Approved :: MIT License",
