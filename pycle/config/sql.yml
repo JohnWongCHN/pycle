@@ -321,3 +321,44 @@ tablespace_max_size: |-
   select e.max
   from e
   where e.tablespace_name = '{0}'
+datafile_discovery: |-
+  SELECT d.file_name
+  FROM   dba_data_files d
+  union
+  select t.file_name
+  from DBA_TEMP_FILES t
+datafile_size: |-
+  with e as (
+      SELECT d.tablespace_name,
+            d.file_name,
+            d.bytes,
+            d.maxbytes
+      FROM dba_data_files d
+      union
+      select t.tablespace_name,
+            t.FILE_NAME,
+            t.bytes,
+            t.maxbytes
+      from DBA_TEMP_FILES t
+  )
+  select e.bytes
+  from e
+  where e.FILE_NAME = '{0}'
+fra_size: |-
+  SELECT SPACE_USED "USED"
+  FROM V$RECOVERY_FILE_DEST
+fra_max: |-
+  SELECT SPACE_LIMIT "MAX"
+  FROM V$RECOVERY_FILE_DEST
+asm_discovery: |-
+  select g.NAME
+  from V$ASM_DISKGROUP g
+# asm磁盘的单位是MB
+asm_size: |-
+  select g.TOTAL_MB - g.FREE_MB used
+  from V$ASM_DISKGROUP g
+  where g.name = '{0}'
+asm_max: |-
+  select g.TOTAL_MB
+  from V$ASM_DISKGROUP g
+  where g.name = '{0}'
