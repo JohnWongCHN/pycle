@@ -13,6 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="http://none",
     packages=setuptools.find_packages(),
+    package_data={'pycle': ['config/sql.yml']},
     install_requires=[
         'Click',
         'cx-Oracle',

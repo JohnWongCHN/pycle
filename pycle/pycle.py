@@ -25,6 +25,7 @@ def pycle(ctx, host, port, sid, user, passwd):
     example: \n
     pycle -h 172.16.2.91 -p 1521 -s ywptdata1 -u pycle -P pycle get-metric -m asm_size -v DATA
     '''
+
     # make dsn and connect to Oracle instance
     dsn = cx_Oracle.makedsn(host=host, port=port, sid=sid)
     conn_parameter = {'username': user, 'password': passwd, 'dsn': dsn}

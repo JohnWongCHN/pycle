@@ -344,6 +344,23 @@ datafile_size: |-
   select e.bytes
   from e
   where e.FILE_NAME = '{0}'
+datafile_max_size: |-
+  with e as (
+      SELECT d.tablespace_name,
+            d.file_name,
+            d.bytes,
+            d.maxbytes
+      FROM dba_data_files d
+      union
+      select t.tablespace_name,
+            t.FILE_NAME,
+            t.bytes,
+            t.maxbytes
+      from DBA_TEMP_FILES t
+  )
+  select e.maxbytes
+  from e
+  where e.FILE_NAME = '{0}'
 fra_size: |-
   SELECT SPACE_USED "USED"
   FROM V$RECOVERY_FILE_DEST
