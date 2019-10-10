@@ -13,9 +13,9 @@ check_active: |-
                 'fm99999999999999990') retvalue
   from (select count(*) inst_cnt
         from v$instance
-        where status = 'open'
-          and logins = 'allowed'
-          and database_status = 'active')
+        where status = 'OPEN'
+          and logins = 'ALLOWED'
+          and database_status = 'ACTIVE')
 read_cache_hit_ratio: |-
   select nvl(to_char((1 - (phy.value - lob.value - dir.value) /
                           ses.value) * 100, 'fm99999990.9999'), '0') retvalue
