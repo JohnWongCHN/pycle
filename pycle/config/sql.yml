@@ -213,15 +213,14 @@ tablespace_discovery: |-
   from DBA_TEMP_FILES
 tablespace_size: |-
   with e as (SELECT a.tablespace_name,
-                    a.bytes_alloc        "SIZE",
-                    NVL(b.bytes_free, 0) "FREE",
-                    a.bytes_alloc - NVL(b.bytes_free, 0)
-                                        "USED",
-                    (NVL(b.bytes_free, 0) / a.bytes_alloc) * 100
-                                        "FREE%",
-                    round(100 - (NVL(b.bytes_free, 0) / a.bytes_alloc) * 100)
-                                        "USED%",
-                    maxbytes             "MAX"
+                    a.bytes_alloc                          "ALLOC",
+                    NVL(b.bytes_free, 0)                   "FREE",
+                    (a.bytes_alloc - NVL(b.bytes_free, 0)) "USED",
+                    ROUND((NVL(b.bytes_free, 0) / a.bytes_alloc) * 100, 2)
+                                                          "FREE(%)",
+                    100 - ROUND((NVL(b.bytes_free, 0) / a.bytes_alloc) * 100, 2)
+                                                          "USED(%)",
+                    maxbytes                               "MAX"
             FROM (SELECT f.tablespace_name,
                           SUM(f.bytes) bytes_alloc,
                           SUM(
@@ -237,20 +236,21 @@ tablespace_size: |-
             WHERE a.tablespace_name = b.tablespace_name(+)
             UNION ALL
             SELECT h.tablespace_name,
-                    SUM(h.bytes_free + h.bytes_used) "SIZE",
+                    SUM(h.bytes_free + h.bytes_used) "ALLOC",
                     SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
                                                     "FREE",
                     SUM(NVL(p.bytes_used, 0))        "USED",
-                    (SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
-                        / SUM(h.bytes_used + h.bytes_free))
-                        * 100
-                                                    "FREE%",
+                    ROUND(
+                                (SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                                    / SUM(h.bytes_used + h.bytes_free))
+                                * 100, 2)
+                                                    "FREE(%)",
                     100
-                        -
-                    round((SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
-                        / SUM(h.bytes_used + h.bytes_free))
-                        * 100)
-                                                    "USED%",
+                        - ROUND(
+                                (SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                                    / SUM(h.bytes_used + h.bytes_free))
+                                * 100, 2)
+                                                    "USED(%)",
                     SUM(
                             DECODE(f.autoextensible, 'YES', f.maxbytes, 'NO', f.bytes)
                         )
@@ -263,20 +263,19 @@ tablespace_size: |-
               AND f.file_id = h.file_id
               AND f.tablespace_name = h.tablespace_name
             GROUP BY h.tablespace_name)
-  select e.USED
+  select e."USED"
   from e
-  where e.tablespace_name = '{0}'
+  where e.TABLESPACE_NAME = '{0}'
 tablespace_max_size: |-
   with e as (SELECT a.tablespace_name,
-                    a.bytes_alloc        "SIZE",
-                    NVL(b.bytes_free, 0) "FREE",
-                    a.bytes_alloc - NVL(b.bytes_free, 0)
-                                        "USED",
-                    (NVL(b.bytes_free, 0) / a.bytes_alloc) * 100
-                                        "FREE%",
-                    round(100 - (NVL(b.bytes_free, 0) / a.bytes_alloc) * 100)
-                                        "USED%",
-                    maxbytes             "MAX"
+                    a.bytes_alloc                          "ALLOC",
+                    NVL(b.bytes_free, 0)                   "FREE",
+                    (a.bytes_alloc - NVL(b.bytes_free, 0)) "USED",
+                    ROUND((NVL(b.bytes_free, 0) / a.bytes_alloc) * 100, 2)
+                                                          "FREE(%)",
+                    100 - ROUND((NVL(b.bytes_free, 0) / a.bytes_alloc) * 100, 2)
+                                                          "USED(%)",
+                    maxbytes                               "MAX"
             FROM (SELECT f.tablespace_name,
                           SUM(f.bytes) bytes_alloc,
                           SUM(
@@ -292,20 +291,21 @@ tablespace_max_size: |-
             WHERE a.tablespace_name = b.tablespace_name(+)
             UNION ALL
             SELECT h.tablespace_name,
-                    SUM(h.bytes_free + h.bytes_used) "SIZE",
+                    SUM(h.bytes_free + h.bytes_used) "ALLOC",
                     SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
                                                     "FREE",
                     SUM(NVL(p.bytes_used, 0))        "USED",
-                    (SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
-                        / SUM(h.bytes_used + h.bytes_free))
-                        * 100
-                                                    "FREE%",
+                    ROUND(
+                                (SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                                    / SUM(h.bytes_used + h.bytes_free))
+                                * 100, 2)
+                                                    "FREE(%)",
                     100
-                        -
-                    round((SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
-                        / SUM(h.bytes_used + h.bytes_free))
-                        * 100)
-                                                    "USED%",
+                        - ROUND(
+                                (SUM((h.bytes_free + h.bytes_used) - NVL(p.bytes_used, 0))
+                                    / SUM(h.bytes_used + h.bytes_free))
+                                * 100, 2)
+                                                    "USED(%)",
                     SUM(
                             DECODE(f.autoextensible, 'YES', f.maxbytes, 'NO', f.bytes)
                         )
@@ -318,9 +318,9 @@ tablespace_max_size: |-
               AND f.file_id = h.file_id
               AND f.tablespace_name = h.tablespace_name
             GROUP BY h.tablespace_name)
-  select e.size
+  select e."MAX"
   from e
-  where e.tablespace_name = '{0}'
+  where e.TABLESPACE_NAME = '{0}'
 datafile_discovery: |-
   SELECT d.file_name
   FROM   dba_data_files d
