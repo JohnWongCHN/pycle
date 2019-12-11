@@ -318,7 +318,7 @@ tablespace_max_size: |-
               AND f.file_id = h.file_id
               AND f.tablespace_name = h.tablespace_name
             GROUP BY h.tablespace_name)
-  select e."MAX"
+  select e."ALLOC"
   from e
   where e.TABLESPACE_NAME = '{0}'
 datafile_discovery: |-
