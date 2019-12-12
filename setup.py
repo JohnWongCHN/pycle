@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="Pycle",
-    version="0.0.9",
+    version="0.0.11",
     author="John Wong",
     author_email="john-wong@outlook.com",
     description="a Commandline Utility for zabbix",
