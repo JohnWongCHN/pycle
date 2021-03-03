@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "env/bin/python",
+    "python.pythonPath": "/Users/john/project/pycle/venv/bin/python3",
     "python.testing.pytestArgs": [
         "--capture=sys",
         "test"
