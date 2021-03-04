@@ -196,52 +196,67 @@ def get_tablespace_stats(ctx):
     获取表空间信息
     """
     sql = """
-        SELECT NVL (b.tablespace_name, NVL (a.tablespace_name, 'UNKNOWN')) as tablespace,
-        dt.contents as type,
-        dt.status as status,
-        round(bytes_alloc - NVL (bytes_free, 0), 2) as used_bytes,
-        round(NVL (bytes_free, 0), 2) as free_bytes,
-        round(bytes_alloc, 2) as allocated_bytes,
-        round(( (bytes_alloc - NVL (bytes_free, 0)) / bytes_alloc) * 100, 2) as used_pct_allocated,
-        round(bytes_max, 2) as max_bytes,
-        CASE
-            WHEN bytes_max > 0
-            THEN round(( (bytes_alloc - NVL (bytes_free, 0)) / bytes_max) * 100, 2)
-        END as used_pct_max
-        FROM
-        (SELECT SUM (bytes) bytes_free,
-            tablespace_name
-        FROM sys.dba_free_space
-        GROUP BY tablespace_name
-        UNION
-        SELECT SUM (free_space) bytes_free,
-            tablespace_name
-        FROM sys.dba_temp_free_space
-        GROUP BY tablespace_name
-        ) a,
-        (SELECT SUM (bytes) bytes_alloc,
-            SUM (maxbytes) bytes_max,
-            tablespace_name,
-            COUNT (*) data_files
-        FROM sys.dba_data_files
-        GROUP BY tablespace_name
-        UNION
-        SELECT SUM (bytes) bytes_alloc,
-            SUM (maxbytes) bytes_max,
-            tablespace_name,
-            COUNT (*) data_files
-        FROM sys.dba_temp_files
-        GROUP BY tablespace_name
-        ) b,
-        (SELECT tablespace_name,
-            decode(status,'ONLINE',1,'OFFLINE',2,'READ ONLY',3,0) as status,
-            contents
-        FROM dba_tablespaces
-        ) dt
-        WHERE a.tablespace_name(+) = b.tablespace_name
-        and b.tablespace_name(+) = dt.tablespace_name
-        AND ( b.tablespace_name IS NULL
-        OR INSTR (LOWER (b.tablespace_name), LOWER (b.tablespace_name)) > 0)
+        SELECT s.tablespace,
+            t.contents                AS type,
+            decode(t.status, 'ONLINE', 1, 'OFFLINE', 2,
+                    'READ ONLY', 3, 0) AS status,
+            s.allocated_bytes,
+            s.free_bytes,
+            s.used_bytes,
+            s.free_pct_allocated,
+            s.used_pct_allocated,
+            s.max_bytes,
+            s.used_pct_max
+        FROM (
+                SELECT a.tablespace_name AS                                                tablespace,
+                        a.bytes_alloc                                                       allocated_bytes,
+                        nvl(b.bytes_free, 0)                                                free_bytes,
+                        a.bytes_alloc - nvl(b.bytes_free, 0)                                used_bytes,
+                        round((nvl(b.bytes_free, 0) / a.bytes_alloc) * 100, 2)              free_pct_allocated,
+                        100 - round((nvl(b.bytes_free, 0) / a.bytes_alloc) * 100, 2)        used_pct_allocated,
+                        maxbytes                                                            max_bytes,
+                        round(((a.bytes_alloc - nvl(b.bytes_free, 0)) / maxbytes) * 100, 2) used_pct_max
+                FROM (
+                        SELECT f.tablespace_name,
+                                SUM(f.bytes)                                                    bytes_alloc,
+                                SUM(decode(f.autoextensible, 'YES', f.maxbytes, 'NO', f.bytes)) maxbytes
+                        FROM dba_data_files f
+                        GROUP BY tablespace_name
+                    ) a,
+                    (
+                        SELECT f.tablespace_name,
+                                SUM(f.bytes) bytes_free
+                        FROM dba_free_space f
+                        GROUP BY tablespace_name
+                    ) b
+                WHERE a.tablespace_name = b.tablespace_name (+)
+                UNION ALL
+                SELECT h.tablespace_name AS                                            tablespace,
+                        SUM(h.bytes_free + h.bytes_used)                                allocated_bytes,
+                        SUM((h.bytes_free + h.bytes_used) - nvl(p.bytes_used, 0))       free_bytes,
+                        SUM(nvl(p.bytes_used, 0))                                       used_bytes,
+                        round((SUM((h.bytes_free + h.bytes_used) - nvl(p.bytes_used, 0)) / SUM(h.bytes_used + h.bytes_free)) *
+                            100, 2)                                                   free_pct_allocated,
+                        100 - round((SUM((h.bytes_free + h.bytes_used) - nvl(p.bytes_used, 0)) /
+                                    SUM(h.bytes_used + h.bytes_free)) * 100, 2)        used_pct_allocated,
+                        SUM(f.maxbytes)                                                 max_bytes,
+                        round(((SUM(nvl(p.bytes_used, 0))) / SUM(f.maxbytes)) * 100, 2) used_pct_max
+                FROM (
+                        SELECT DISTINCT *
+                        FROM sys.gv_$temp_space_header
+                    ) h,
+                    (
+                        SELECT DISTINCT *
+                        FROM sys.gv_$temp_extent_pool
+                    ) p,
+                    dba_temp_files f
+                WHERE p.file_id (+) = h.file_id
+                AND p.tablespace_name (+) = h.tablespace_name
+                AND f.file_id = h.file_id
+                AND f.tablespace_name = h.tablespace_name
+                GROUP BY h.tablespace_name
+            ) s
+                LEFT JOIN dba_tablespaces t ON s.tablespace = t.tablespace_name
     """
     sql = sql.strip()
     try:
