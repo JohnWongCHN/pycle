@@ -1,3 +1,2 @@
-Click==7.0
-cx-Oracle==7.1.2
-PyYAML==5.1.2
+click==7.1.2
+cx-Oracle==8.1.0
